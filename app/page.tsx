@@ -255,7 +255,7 @@ export default function Home() {
   async function fetchRestaurants(regions: string[]) {
     setLoading(true);
     const { data, error } = await supabase
-      .from("restaurants")
+      .from("ramen_restaurants")
       .select("id, name, latitude, longitude, address, cuisine, opening_hours, website, region")
       .in("region", regions);
     if (error) console.error("Supabase error:", error);

@@ -1,0 +1,13 @@
+{
+  "name": "ラ・ラ・ラーメン",
+  "short_name": "ラ・ラ・ラーメン",
+  "description": "全国のラーメン・つけ麺・担々麺などの麺料理店を地図で見つけるアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#7f1d1d",
+  "theme_color": "#7f1d1d",
+  "icons": [
+    { "src": "/ramen-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/ramen-icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

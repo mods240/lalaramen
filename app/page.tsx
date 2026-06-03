@@ -227,7 +227,9 @@ export default function Home() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  // locating完了後にlocalStorage確認・エリア選択判定
   useEffect(() => {
+    if (locating) return;
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) { setSelectedRegions(JSON.parse(saved)); }
     else { setShowRegionSelect(true); }
@@ -236,7 +238,7 @@ export default function Home() {
     const savedInterested = localStorage.getItem(INTERESTED_KEY);
     if (savedInterested) { setInterested(new Set(JSON.parse(savedInterested))); }
     setInitialized(true);
-  }, []);
+  }, [locating]);
 
   useEffect(() => {
     if (!initialized || selectedRegions.length === 0) return;
@@ -315,6 +317,17 @@ export default function Home() {
     : sortedRestaurants;
 
   const bookmarkedRestaurants = sortedRestaurants.filter(r => bookmarks.has(r.id));
+
+  // 位置情報取得中
+  if (locating) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-red-50 gap-4">
+        <p className="text-4xl">🍜</p>
+        <p className="text-red-700 font-bold text-lg">位置情報を取得中...</p>
+        <p className="text-red-400 text-sm">少々お待ちください</p>
+      </div>
+    );
+  }
 
   if (showRegionSelect) {
     return (
@@ -489,12 +502,12 @@ export default function Home() {
       </div>
 
       <div className="flex-1 overflow-hidden">
-        {loading || locating ? (
+        {loading ? (
           <div className="flex flex-col items-center justify-center h-full gap-2">
             <p className="text-red-800">🍜 読み込み中...</p>
           </div>
         ) : view === "map" ? (
-          <div className="h-full">
+          <div className="h-full relative">
             <Map
               restaurants={restaurants}
               center={center}
@@ -503,6 +516,18 @@ export default function Home() {
               onToggleBookmark={toggleBookmark}
               onToggleInterested={toggleInterested}
             />
+            {hasLocation && (
+              <button
+                onClick={() => {
+                  const map = (window as any)._ramenMap;
+                  if (map && currentPosRef.current) {
+                    map.setView(currentPosRef.current, 16);
+                  }
+                }}
+                style={{ position:'absolute', bottom:32, right:12, zIndex:1000, width:44, height:44, borderRadius:'50%', background:'#7f1d1d', border:'3px solid white', color:'white', fontSize:20, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 8px rgba(0,0,0,0.3)' }}
+                title="現在地に戻る"
+              >📍</button>
+            )}
           </div>
         ) : view === "bookmarks" ? (
           <div className="h-full overflow-y-auto">
